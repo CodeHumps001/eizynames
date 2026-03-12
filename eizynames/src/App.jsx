@@ -3,6 +3,7 @@ import { nameData } from "./data/nameData";
 import { genName, copyText, fallbackCopy, pick } from "./utils/helpers";
 import Sidebar from "./component/sidebar";
 import NameCard from "./component/nameCard";
+import { Analytics } from "@vercel/analytics/next";
 
 const COUNTS = [10, 20, 50, 100];
 const REGIONS = [
@@ -130,6 +131,7 @@ export default function App() {
         overflowX: "hidden", // Critical for mobile
       }}
     >
+      <Analytics />
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         
