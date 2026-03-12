@@ -29,6 +29,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [copied, setCopied] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [usedNames, setUsedNames] = useState(new Set());
 
   // Monitor scroll for the centered glass header effect
   useEffect(() => {
@@ -64,12 +65,27 @@ export default function App() {
       };
 
   const doGenerate = useCallback(() => {
-    const list = Array.from({ length: count }, () => {
+    const newNames = [];
+    const newUsedNames = new Set(usedNames);
+    let attempts = 0;
+    const maxAttempts = count * 15; // Prevent infinite loops
+
+    // Generate unique names
+    while (newNames.length < count && attempts < maxAttempts) {
       const c = randomMode ? pick(Object.keys(nameData)) : country;
       const g = gender === "both" ? pick(["male", "female"]) : gender;
-      return genName(c, g);
-    });
-    setNames(list);
+      const nameObj = genName(c, g);
+      const nameKey = `${nameObj.full}|${nameObj.country}`;
+
+      if (!newUsedNames.has(nameKey)) {
+        newNames.push(nameObj);
+        newUsedNames.add(nameKey);
+      }
+      attempts++;
+    }
+
+    setNames(newNames);
+    setUsedNames(newUsedNames);
     setCurrentPage(1);
   }, [count, randomMode, country, gender]);
 
@@ -87,6 +103,11 @@ export default function App() {
     copyText(text, fallbackCopy);
     setCopied(id);
     setTimeout(() => setCopied(null), 2000);
+  };
+
+  const resetSession = () => {
+    setUsedNames(new Set());
+    doGenerate();
   };
 
   const countries = Object.keys(nameData).filter((c) => {
@@ -329,6 +350,8 @@ export default function App() {
             countries={countries}
             doGenerate={doGenerate}
             names={names}
+            resetSession={resetSession}
+            usedNamesCount={usedNames.size}
           />
 
           <div className="main-content">

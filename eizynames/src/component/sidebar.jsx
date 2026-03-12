@@ -22,6 +22,8 @@ const Sidebar = ({
   countries = [],
   doGenerate,
   names = [],
+  resetSession,
+  usedNamesCount = 0,
 }) => {
   if (!D || !nameData) return null;
 
@@ -305,6 +307,26 @@ const Sidebar = ({
         >
           ✦ Generate Names
         </button>
+
+        {/* Reset Session Button */}
+        {usedNamesCount > 0 && (
+          <button
+            onClick={resetSession}
+            style={{
+              background: "transparent",
+              color: D.accent,
+              border: `1.5px solid ${D.accent}`,
+              padding: "12px",
+              borderRadius: 12,
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: "pointer",
+              transition: "all 0.2s",
+            }}
+          >
+            🔄 Reset Session ({usedNamesCount} tracked)
+          </button>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -337,6 +359,21 @@ const Sidebar = ({
           <div style={{ fontSize: 20, fontWeight: 900 }}>{names.length}</div>
           <div style={{ fontSize: 11, color: D.muted, fontWeight: 700 }}>
             Generated
+          </div>
+        </div>
+        <div
+          style={{
+            background: D.card,
+            border: `1px solid ${D.cardBorder}`,
+            borderRadius: 20,
+            padding: 16,
+            gridColumn: usedNamesCount > 0 ? "1" : "1 / -1",
+          }}
+        >
+          <div style={{ fontSize: 20, marginBottom: 8 }}>✨</div>
+          <div style={{ fontSize: 20, fontWeight: 900 }}>{usedNamesCount}</div>
+          <div style={{ fontSize: 11, color: D.muted, fontWeight: 700 }}>
+            Unique in Session
           </div>
         </div>
       </div>
