@@ -1,0 +1,5 @@
+.namecard:hover {
+  transform: translateY(-4px);
+  border-color: #7c6ff7 !important; /* Use D.accent value here */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
