@@ -1,7 +1,7 @@
 import React from "react";
 
 const Sidebar = ({
-  D,
+  dark,
   gender,
   setGender,
   count,
@@ -25,222 +25,175 @@ const Sidebar = ({
   resetSession,
   usedNamesCount = 0,
 }) => {
-  if (!D || !nameData) return null;
+  if (!nameData) return null;
 
-  // Shared button style helper
-  const btnStyle = (isActive) => ({
-    flex: 1,
-    padding: "12px 4px",
-    borderRadius: 12,
-    border: "1.5px solid",
-    fontSize: "13px",
-    fontWeight: 700,
-    cursor: "pointer",
-    transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-    borderColor: isActive ? D.accent : D.cardBorder,
-    background: isActive ? D.accentBg : D.inputBg,
-    color: isActive ? D.accent : D.muted,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "6px",
-  });
+  // ── Reusable segment button ──────────────────────────────────────────────
+  const SegBtn = ({ isActive, onClick, children }) => (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`
+        flex-1 flex items-center justify-center gap-1.5 py-3 px-1 rounded-xl
+        border-[1.5px] text-[13px] font-bold cursor-pointer
+        transition-all duration-200 select-none
+        ${
+          isActive
+            ? "border-orange-400 dark:border-orange-500 bg-orange-50 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400"
+            : "border-slate-200 dark:border-white/[0.07] bg-slate-50 dark:bg-white/[0.04] text-slate-400 dark:text-orange-200/30 hover:border-orange-300 dark:hover:border-orange-500/40 hover:text-orange-500 dark:hover:text-orange-400"
+        }
+      `}
+    >
+      {children}
+    </button>
+  );
+
+  // ── Section label ────────────────────────────────────────────────────────
+  const Label = ({ children }) => (
+    <span className="block text-[10px] font-black text-slate-400 dark:text-orange-200/30 uppercase tracking-[1.2px] mb-3">
+      {children}
+    </span>
+  );
 
   return (
-    <div
-      style={{
-        position: "sticky",
-        top: 80,
-        display: "flex",
-        flexDirection: "column",
-        gap: 20,
-      }}
-    >
-      {/* Main Control Card */}
+    <div className="lg:sticky lg:top-[80px] flex flex-col gap-5">
+      {/* ── Main control card ─────────────────────────────────────────────── */}
       <div
+        className="rounded-3xl p-6 flex flex-col gap-6 border"
         style={{
-          background: D.card,
-          border: `1px solid ${D.cardBorder}`,
-          borderRadius: 24,
-          padding: 24,
-          display: "flex",
-          flexDirection: "column",
-          gap: 24,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          backgroundColor: dark ? "#1a0d08" : "#ffffff",
+          borderColor: dark ? "rgba(251,146,60,0.1)" : "rgba(253,186,116,0.3)",
+          boxShadow: dark ? "none" : "0 2px 16px rgba(251,146,60,0.06)",
         }}
       >
         {/* Gender */}
         <div>
-          <label
-            style={{
-              fontSize: 11,
-              fontWeight: 900,
-              color: D.muted,
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              marginBottom: 12,
-              display: "block",
-            }}
-          >
-            Gender
-          </label>
-          <div style={{ display: "flex", gap: 8 }}>
+          <Label>Gender</Label>
+          <div className="flex gap-2">
             {[
               ["male", "♂ Male"],
               ["female", "♀ Female"],
               ["both", "⚥ Both"],
             ].map(([v, l]) => (
-              <button
+              <SegBtn
                 key={v}
+                isActive={gender === v}
                 onClick={() => setGender(v)}
-                style={btnStyle(gender === v)}
               >
                 {l}
-              </button>
+              </SegBtn>
             ))}
           </div>
         </div>
 
         {/* Quantity */}
         <div>
-          <label
-            style={{
-              fontSize: 11,
-              fontWeight: 900,
-              color: D.muted,
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              marginBottom: 12,
-              display: "block",
-            }}
-          >
-            Quantity
-          </label>
-          <div style={{ display: "flex", gap: 8 }}>
+          <Label>Quantity</Label>
+          <div className="flex gap-2">
             {COUNTS.map((n) => (
-              <button
+              <SegBtn
                 key={n}
+                isActive={count === n}
                 onClick={() => setCount(n)}
-                style={btnStyle(count === n)}
               >
                 {n}
-              </button>
+              </SegBtn>
             ))}
           </div>
         </div>
 
-        {/* Country Mode (Pick vs Random) */}
+        {/* Country Mode */}
         <div>
-          <label
-            style={{
-              fontSize: 11,
-              fontWeight: 900,
-              color: D.muted,
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-              marginBottom: 12,
-              display: "block",
-            }}
-          >
-            Country Mode
-          </label>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              onClick={() => setRandomMode(false)}
-              style={btnStyle(!randomMode)}
-            >
+          <Label>Country Mode</Label>
+          <div className="flex gap-2">
+            <SegBtn isActive={!randomMode} onClick={() => setRandomMode(false)}>
               📌 Pick
-            </button>
-            <button
-              onClick={() => setRandomMode(true)}
-              style={btnStyle(randomMode)}
-            >
+            </SegBtn>
+            <SegBtn isActive={randomMode} onClick={() => setRandomMode(true)}>
               🎲 Random
-            </button>
+            </SegBtn>
           </div>
         </div>
 
-        {/* Country & Region Selection */}
+        {/* Country & Region picker */}
         {!randomMode && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <label
-              style={{
-                fontSize: 11,
-                fontWeight: 900,
-                color: D.muted,
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-                display: "block",
-              }}
-            >
-              Country
-            </label>
+          <div className="flex flex-col gap-3">
+            <Label>Country</Label>
 
-            {/* Region Pills */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {/* Region pills */}
+            <div className="flex flex-wrap gap-1.5">
               {REGIONS.map((r) => (
                 <button
                   key={r}
+                  type="button"
                   onClick={() => setRegion(r)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: 20,
-                    border: "1px solid",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    borderColor: region === r ? D.accent : D.cardBorder,
-                    background: region === r ? D.accentBg : "transparent",
-                    color: region === r ? D.accent : D.muted,
-                  }}
+                  className={`
+                    px-3 py-1.5 rounded-full border text-[11px] font-semibold
+                    cursor-pointer transition-all duration-150
+                    ${
+                      region === r
+                        ? "border-orange-400 dark:border-orange-500 bg-orange-50 dark:bg-orange-500/15 text-orange-600 dark:text-orange-400"
+                        : "border-slate-200 dark:border-white/[0.07] bg-transparent text-slate-400 dark:text-orange-200/30 hover:border-orange-300 dark:hover:border-orange-500/35 hover:text-orange-500 dark:hover:text-orange-300"
+                    }
+                  `}
                 >
                   {r}
                 </button>
               ))}
             </div>
 
-            {/* Custom Dropdown */}
-            <div style={{ position: "relative" }}>
-              <div
+            {/* Country dropdown trigger */}
+            <div className="relative">
+              <button
+                type="button"
                 onClick={() => setShowDropdown(!showDropdown)}
+                className="w-full flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-150 cursor-pointer border-[1.5px]"
                 style={{
-                  background: D.inputBg,
-                  border: `1.5px solid ${D.cardBorder}`,
-                  borderRadius: 12,
-                  padding: "12px 16px",
-                  cursor: "pointer",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  fontSize: 14,
-                  fontWeight: 600,
+                  backgroundColor: dark ? "#0f0805" : "#fff8f5",
+                  borderColor: showDropdown
+                    ? dark
+                      ? "rgba(251,146,60,0.5)"
+                      : "#fb923c"
+                    : dark
+                      ? "rgba(251,146,60,0.15)"
+                      : "rgba(253,186,116,0.45)",
+                  color: dark ? "rgba(253,186,116,0.8)" : "#431407",
                 }}
               >
                 <span>
                   {nameData[country]?.flag} {country}
                 </span>
-                <span style={{ fontSize: 10 }}>▼</span>
-              </div>
-
-              {showDropdown && (
-                <div
+                <span
+                  className="text-[9px] transition-transform duration-200"
                   style={{
-                    position: "absolute",
-                    top: "110%",
-                    left: 0,
-                    right: 0,
-                    background: D.card,
-                    border: `1px solid ${D.cardBorder}`,
-                    borderRadius: 16,
-                    zIndex: 1000,
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-                    overflow: "hidden",
+                    color: dark ? "rgba(251,146,60,0.4)" : "#fb923c",
+                    transform: showDropdown ? "rotate(180deg)" : "rotate(0deg)",
                   }}
                 >
+                  ▼
+                </span>
+              </button>
+
+              {/* Dropdown panel */}
+              {showDropdown && (
+                <div
+                  className="absolute top-[calc(100%+6px)] left-0 right-0 z-50 rounded-2xl overflow-hidden border"
+                  style={{
+                    backgroundColor: dark ? "#1a0d08" : "#ffffff",
+                    borderColor: dark
+                      ? "rgba(251,146,60,0.12)"
+                      : "rgba(253,186,116,0.4)",
+                    boxShadow: dark
+                      ? "0 20px 40px rgba(0,0,0,0.5)"
+                      : "0 20px 40px rgba(251,146,60,0.12)",
+                  }}
+                >
+                  {/* Search input */}
                   <div
+                    className="p-2.5 border-b"
                     style={{
-                      padding: 10,
-                      borderBottom: `1px solid ${D.divider}`,
+                      borderColor: dark
+                        ? "rgba(251,146,60,0.08)"
+                        : "rgba(253,186,116,0.2)",
                     }}
                   >
                     <input
@@ -248,36 +201,71 @@ const Sidebar = ({
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                       placeholder="Search country..."
+                      className="w-full text-[13px] px-3 py-2 rounded-lg outline-none border transition-colors duration-150"
                       style={{
-                        width: "100%",
-                        background: D.inputBg,
-                        border: "none",
-                        padding: 8,
-                        color: D.text,
-                        outline: "none",
-                        fontSize: 13,
+                        backgroundColor: dark ? "#0f0805" : "#fff8f5",
+                        color: dark ? "rgba(253,186,116,0.85)" : "#431407",
+                        borderColor: dark
+                          ? "rgba(251,146,60,0.15)"
+                          : "rgba(253,186,116,0.35)",
                       }}
                     />
                   </div>
-                  <div style={{ maxHeight: 200, overflowY: "auto" }}>
+
+                  {/* Country list */}
+                  <div className="max-h-52 overflow-y-auto overscroll-contain">
+                    {countries.length === 0 && (
+                      <p
+                        className="text-center text-sm py-6"
+                        style={{
+                          color: dark ? "rgba(251,146,60,0.3)" : "#fdba74",
+                        }}
+                      >
+                        No results
+                      </p>
+                    )}
                     {countries.map((c) => (
-                      <div
+                      <button
                         key={c}
+                        type="button"
                         onClick={() => {
                           setCountry(c);
                           setShowDropdown(false);
                         }}
+                        className="w-full text-left px-4 py-3 text-[13px] font-medium transition-colors duration-100 cursor-pointer"
                         style={{
-                          padding: "12px 16px",
-                          cursor: "pointer",
-                          fontSize: 13,
-                          background:
-                            country === c ? D.accentBg : "transparent",
-                          color: country === c ? D.accent : D.text,
+                          backgroundColor:
+                            country === c
+                              ? dark
+                                ? "rgba(251,146,60,0.12)"
+                                : "#fff1e6"
+                              : "transparent",
+                          color:
+                            country === c
+                              ? dark
+                                ? "#fb923c"
+                                : "#c2410c"
+                              : dark
+                                ? "rgba(253,186,116,0.7)"
+                                : "#57280e",
+                          fontWeight: country === c ? 700 : 500,
+                        }}
+                        onMouseEnter={(e) => {
+                          if (country !== c) {
+                            e.currentTarget.style.backgroundColor = dark
+                              ? "rgba(251,146,60,0.06)"
+                              : "#fff8f5";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (country !== c) {
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
+                          }
                         }}
                       >
                         {nameData[c].flag} {c}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -286,99 +274,103 @@ const Sidebar = ({
           </div>
         )}
 
-        {/* Generate Button */}
+        {/* Generate button */}
         <button
+          type="button"
           onClick={doGenerate}
+          className="mt-1 w-full flex items-center justify-center gap-2 py-4 rounded-2xl text-white font-extrabold text-[15px] tracking-tight hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 cursor-pointer border-0"
           style={{
-            background: `linear-gradient(135deg, ${D.accent}, #a855f7)`,
-            color: "#fff",
-            border: "none",
-            padding: "16px",
-            borderRadius: 16,
-            fontWeight: 800,
-            fontSize: 15,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            marginTop: 8,
+            background: "linear-gradient(135deg, #f97316, #e11d48)",
+            boxShadow: "0 6px 24px rgba(249,115,22,0.35)",
           }}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.boxShadow =
+              "0 10px 32px rgba(249,115,22,0.48)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.boxShadow =
+              "0 6px 24px rgba(249,115,22,0.35)")
+          }
         >
           ✦ Generate Names
         </button>
 
-        {/* Reset Session Button */}
+        {/* Reset session */}
         {usedNamesCount > 0 && (
           <button
+            type="button"
             onClick={resetSession}
+            className="w-full py-3 rounded-xl bg-transparent text-[13px] font-bold transition-all duration-150 cursor-pointer border-[1.5px]"
             style={{
-              background: "transparent",
-              color: D.accent,
-              border: `1.5px solid ${D.accent}`,
-              padding: "12px",
-              borderRadius: 12,
-              fontWeight: 700,
-              fontSize: 13,
-              cursor: "pointer",
-              transition: "all 0.2s",
+              borderColor: dark ? "rgba(251,146,60,0.3)" : "#fb923c",
+              color: dark ? "#fb923c" : "#c2410c",
             }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = dark
+                ? "rgba(251,146,60,0.08)"
+                : "#fff1e6")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
           >
             🔄 Reset Session ({usedNamesCount} tracked)
           </button>
         )}
       </div>
 
-      {/* Stats Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <div
-          style={{
-            background: D.card,
-            border: `1px solid ${D.cardBorder}`,
-            borderRadius: 20,
-            padding: 16,
-          }}
-        >
-          <div style={{ fontSize: 20, marginBottom: 8 }}>🌍</div>
-          <div style={{ fontSize: 20, fontWeight: 900 }}>
-            {Object.keys(nameData).length}
-          </div>
-          <div style={{ fontSize: 11, color: D.muted, fontWeight: 700 }}>
-            Countries
-          </div>
-        </div>
-        <div
-          style={{
-            background: D.card,
-            border: `1px solid ${D.cardBorder}`,
-            borderRadius: 20,
-            padding: 16,
-          }}
-        >
-          <div style={{ fontSize: 20, marginBottom: 8 }}>👥</div>
-          <div style={{ fontSize: 20, fontWeight: 900 }}>{names.length}</div>
-          <div style={{ fontSize: 11, color: D.muted, fontWeight: 700 }}>
-            Generated
-          </div>
-        </div>
-        <div
-          style={{
-            background: D.card,
-            border: `1px solid ${D.cardBorder}`,
-            borderRadius: 20,
-            padding: 16,
-            gridColumn: usedNamesCount > 0 ? "1" : "1 / -1",
-          }}
-        >
-          <div style={{ fontSize: 20, marginBottom: 8 }}>✨</div>
-          <div style={{ fontSize: 20, fontWeight: 900 }}>{usedNamesCount}</div>
-          <div style={{ fontSize: 11, color: D.muted, fontWeight: 700 }}>
-            Unique in Session
-          </div>
+      {/* ── Stats grid ────────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3">
+        <StatCard
+          emoji="🌍"
+          value={Object.keys(nameData).length}
+          label="Countries"
+          dark={dark}
+        />
+        <StatCard
+          emoji="👥"
+          value={names.length}
+          label="Generated"
+          dark={dark}
+        />
+        <div className={usedNamesCount > 0 ? "col-span-1" : "col-span-2"}>
+          <StatCard
+            emoji="✨"
+            value={usedNamesCount}
+            label="Unique in Session"
+            dark={dark}
+            full
+          />
         </div>
       </div>
     </div>
   );
 };
+
+// ── Stat card ─────────────────────────────────────────────────────────────────
+const StatCard = ({ emoji, value, label, dark, full }) => (
+  <div
+    className={`rounded-2xl p-4 border ${full ? "w-full" : ""}`}
+    style={{
+      backgroundColor: dark ? "#1a0d08" : "#ffffff",
+      borderColor: dark ? "rgba(251,146,60,0.1)" : "rgba(253,186,116,0.3)",
+      boxShadow: dark ? "none" : "0 2px 12px rgba(251,146,60,0.05)",
+    }}
+  >
+    <div className="text-xl mb-2">{emoji}</div>
+    <div
+      className="text-xl font-black"
+      style={{ color: dark ? "rgba(253,186,116,0.9)" : "#431407" }}
+    >
+      {value}
+    </div>
+    <div
+      className="text-[11px] font-bold mt-0.5"
+      style={{ color: dark ? "rgba(251,146,60,0.35)" : "#fdba74" }}
+    >
+      {label}
+    </div>
+  </div>
+);
 
 export default Sidebar;
